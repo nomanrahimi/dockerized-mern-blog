@@ -1,0 +1,41 @@
+version: '3'
+services:
+  mongodb:
+    image: 'mongo'
+    volumes:
+      - data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=noman
+      - MONGO_INITDB_ROOT_PASSWORD=phpartisanserve
+    ports:
+      - '27017:27017'
+    # networks:
+    #   - blog-net
+  backend:
+    image: 'blog:backend'
+    ports:
+      - '8000:8000'
+    volumes:
+      - blog-uploads:/blog_project/uploads
+      - ./backend:/blog_project
+      - /blog_project/node_modules
+    environment:
+      - MONGODB_USERNAME=noman
+      - MONGODB_PASSWORD=phpartisanserve
+    depends_on:
+      - mongodb
+  frontend:
+    image: 'blog:frontend'
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend/src:/blog_project/src
+      - /blog_project/node_modules
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+
+volumes:
+  data:
+  blog-uploads:
